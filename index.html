@@ -1,0 +1,1850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onside Studio — Design, Code & AI Workflows</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://www.youtube.com">
+<link rel="preconnect" href="https://i.pinimg.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lenis/1.1.13/lenis.min.js"></script>
+<style>
+  :root{
+    --bg: #16120F;
+    --bg-soft: #1d1812;
+    --text: #f4f0ea;
+    --text-dim: #9c948a;
+    --text-dimmer: #6f675e;
+    --hairline: rgba(244,240,234,0.08);
+    --accent-orange: #c96a3a;
+    --accent-green: #4ade80;
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+
+  html, body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Instrument Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+    overflow-x: hidden;
+    width: 100%;
+    height: 100%;
+  }
+
+  html, body{ height: 100%; }
+  html.lenis, html.lenis body{ height: auto; }
+  html.lenis{ scroll-behavior: auto !important; }
+
+  body{
+    min-height: 100vh;
+    background: var(--bg);
+  }
+
+  a{ color: inherit; text-decoration: none; }
+
+  ::selection{ background: var(--accent-orange); color: #17130f; }
+
+  img, video{ max-width: 100%; }
+
+  /* ---------- NAV ---------- */
+  .nav{
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    padding: 5px 18px;
+    position: relative;
+    z-index: 20;
+  }
+
+  .nav-left{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+  }
+
+  .nav-logo{
+    width: 22px;
+    height: 22px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink: 0;
+  }
+
+  .nav-logo img{
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+
+  .nav-name{
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: -0.01em;
+  }
+
+  .nav-role{
+    font-weight: 400;
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  .nav-links{
+    display:flex;
+    align-items:center;
+    gap: 235px;
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-left: auto;
+    margin-right: 24px;
+  }
+
+  .nav-links a{
+    position: relative;
+    transition: color .25s ease;
+  }
+  .nav-links a:hover{ color: var(--text); }
+  .nav-links a::after{
+    content:'';
+    position:absolute;
+    left:0; bottom:-4px;
+    width:0; height:1px;
+    background: var(--text);
+    transition: width .25s ease;
+  }
+  .nav-links a:hover::after{ width:100%; }
+
+  .theme-toggle{
+    width: 22px;
+    height: 22px;
+    border-radius: 3px;
+    background: var(--text);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color: var(--bg);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: transform .3s ease;
+  }
+  .theme-toggle:hover{ transform: scale(1.08); }
+  .theme-toggle svg{ width:15px; height:15px; }
+
+  /* mobile nav toggle (hidden on desktop) */
+  .nav-burger{
+    display: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+    background: rgba(244,240,234,0.06);
+    border: 1px solid var(--hairline);
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .nav-burger span{
+    position: relative;
+    width: 16px;
+    height: 1px;
+    background: var(--text);
+    display: block;
+  }
+  .nav-burger span::before,
+  .nav-burger span::after{
+    content:'';
+    position:absolute;
+    left:0;
+    width: 16px;
+    height: 1px;
+    background: var(--text);
+    transition: transform .25s ease;
+  }
+  .nav-burger span::before{ top:-5px; }
+  .nav-burger span::after{ top:5px; }
+  .nav-burger.is-open span{ background: transparent; }
+  .nav-burger.is-open span::before{ top:0; transform: rotate(45deg); }
+  .nav-burger.is-open span::after{ top:0; transform: rotate(-45deg); }
+
+  .nav-mobile-overlay{
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 6, 4, 0.55);
+    z-index: 998;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .35s ease, visibility .35s ease;
+  }
+  .nav-mobile-overlay.is-open{
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .nav-mobile-panel{
+    display: none;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    height: 100dvh;
+    width: min(78vw, 320px);
+    background: var(--bg-soft);
+    border-left: 1px solid var(--hairline);
+    box-shadow: -30px 0 60px rgba(0,0,0,0.35);
+    padding: 90px 26px 28px;
+    gap: 2px;
+    z-index: 999;
+    overflow-y: auto;
+    transform: translateX(100%);
+    transition: transform .4s cubic-bezier(.2,.8,.2,1);
+    will-change: transform;
+  }
+  .nav-mobile-panel a{
+    font-size: 16px;
+    color: var(--text-dim);
+    padding: 14px 2px;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .nav-mobile-panel a:hover{ color: var(--text); }
+  .nav-mobile-panel.is-open{ transform: translateX(0); }
+
+  .nav-mobile-theme-row{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 2px 0;
+    margin-top: auto;
+  }
+  .nav-mobile-theme-row .label{
+    font-size: 13px;
+    color: var(--text-dimmer);
+  }
+  .nav-mobile-theme-toggle{
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--bg);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .nav-mobile-theme-toggle svg{ width: 17px; height: 17px; }
+
+  /* ---------- INTRO PARAGRAPH ---------- */
+  .intro-wrap{
+    display:flex;
+    justify-content:flex-end;
+    padding: 120px 64px 0 48px;
+  }
+
+  .intro-text{
+    max-width: 330px;
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: var(--text-dim);
+    text-align: left;
+  }
+
+  .intro-text b, .intro-text strong{
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* ---------- WORK GALLERY (two images after the intro text) ---------- */
+  .work-gallery{
+    display: grid;
+    grid-template-columns: 1.9fr 1fr;
+    gap: 10px;
+    padding: 48px 15px 0;
+    opacity: 0;
+    padding-top: 0;
+  }
+
+  .work-card{
+    position: relative;
+    border-radius: 7px;
+    overflow: hidden;
+    height: clamp(220px, 48vw, 700px);
+    min-height: 0;
+    background: var(--bg-soft);
+    border: none;
+    transform: translateZ(0);
+  }
+
+  .work-card img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform .6s cubic-bezier(.16,1,.3,1);
+    will-change: transform;
+  }
+
+  .work-card:hover img{
+    transform: scale(1.035);
+  }
+
+  .work-card .work-label{
+    position: absolute;
+    left: 16px;
+    bottom: 14px;
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--text);
+    background: rgba(22,18,15,0.55);
+    backdrop-filter: blur(6px);
+    padding: 5px 10px;
+    border-radius: 3px;
+    border: 1px solid var(--hairline);
+  }
+
+  /* ---------- HERO HEADLINE ---------- */
+  .hero{
+    position: relative;
+    padding: 50px 15px 90px;
+  }
+
+  .headline-line{
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    line-height: 0.98;
+  }
+
+  .headline{
+    font-weight: 200;
+    font-size: clamp(25px, 6.2vw, 77px);
+    letter-spacing: -0.03em;
+    color: var(--text);
+  }
+
+  .headline-script{
+    font-family: "Instrument Serif", serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(46px, 7vw, 104px);
+    letter-spacing: -0.01em;
+    color: var(--text);
+    margin-right: 18px;
+    line-height: 1;
+  }
+
+  /* ---------- CLIENT WORK LIST ---------- */
+  .client-work{
+    padding: 40px 15px 100px;
+    padding-top: 180px;
+  }
+
+  .cw-header{
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 56px;
+  }
+
+  .cw-header-inner{
+    padding-right: 0;
+    margin-right: 49px;
+    max-width: 640px;
+    text-align: left;
+  }
+
+  .cw-eyebrow{
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+    letter-spacing: 0.01em;
+  }
+
+  .cw-headline{
+    font-weight: 300;
+    font-size: clamp(1.5rem, 2.4vw, 2.125rem);
+    line-height: 1.22;
+    letter-spacing: -0.015em;
+    color: var(--text);
+  }
+
+  .cw-headline em{
+    font-family: "Instrument Serif", serif;
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .cw-list{
+    border-top: 1px solid var(--hairline);
+    padding-right: 49px;
+  }
+
+  .cw-row{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 24px;
+    padding: 22px 4px;
+    border-bottom: 1px solid var(--hairline);
+    transition: padding-left .3s ease, opacity .3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cw-row::before{
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 0;
+    background: #ffffff;
+    transition: height .38s cubic-bezier(.2,.8,.2,1);
+    z-index: 0;
+  }
+
+  .cw-row:hover::before,
+  .cw-row.is-active::before{
+    height: 100%;
+  }
+
+  .cw-row:hover,
+  .cw-row.is-active{
+    padding-left: 14px;
+  }
+
+  .cw-row > *{
+    position: relative;
+    z-index: 1;
+  }
+
+  .cw-row:hover .cw-row-name,
+  .cw-row:hover .cw-row-meta,
+  .cw-row:hover .cw-row-year,
+  .cw-row.is-active .cw-row-name,
+  .cw-row.is-active .cw-row-meta,
+  .cw-row.is-active .cw-row-year{
+    color: #16120F;
+  }
+
+  .cw-row-name{
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    flex: 0 0 auto;
+    min-width: 120px;
+    transition: color .25s ease;
+  }
+
+  .cw-row-meta{
+    font-size: 13px;
+    color: var(--text-dim);
+    flex: 1;
+    text-align: right;
+    transition: color .25s ease;
+  }
+
+  .cw-row-year{
+    font-size: 13px;
+    color: var(--text-dimmer);
+    flex: 0 0 auto;
+    transition: color .25s ease;
+  }
+
+  .cursor-preview{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 220px;
+    height: 140px;
+    border-radius: 16px;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, -50%) translateY(18px) scale(0.94);
+    transition: opacity .22s ease, transform .28s cubic-bezier(.2,.8,.2,1);
+    z-index: 1000;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.24);
+    border: 1px solid rgba(255,255,255,0.2);
+    will-change: transform;
+  }
+
+  .cursor-preview.is-visible{
+    opacity: 1;
+    transform: translate(-50%, -50%) translateY(0) scale(1);
+  }
+
+  .cursor-preview img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .cw-footer{
+    margin-top: 32px;
+  }
+
+  .cw-all-btn{
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    background: #241F1A;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 3px;
+    transition: background .25s ease, border-color .25s ease;
+  }
+
+  .cw-all-btn:hover{
+    background: rgba(244,240,234,0.08);
+    border-color: rgba(244,240,234,0.16);
+  }
+
+  /* ---------- MASONRY GALLERY (student projects / freelance / experiments) ---------- */
+  .gallery-section{
+    padding: 60px 15px 140px;
+  }
+
+  .gallery-heading{
+    text-align: center;
+    font-weight: 300;
+    font-size: clamp(22px, 3vw, 34px);
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    max-width: 720px;
+    margin: 0 auto 30px;
+  }
+
+  .gallery-heading em{
+    font-family: "Instrument Serif", serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--text);
+  }
+
+  /* CSS columns give every card its own natural height —
+     no forced aspect-ratio, so the grid flows like a real masonry wall */
+  .masonry{
+    column-count: 4;
+    column-gap: 10px;
+  }
+
+  .g-card{
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    margin-bottom: 24px;
+    position: relative;
+    border-radius: 7px;
+    overflow: hidden;
+    background: var(--bg-soft);
+    border: none;
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  .g-card img{
+    display: block;
+    width: 100%;
+    height: auto;   /* height follows the image's own intrinsic ratio */
+    transition: transform .6s cubic-bezier(.16,1,.3,1);
+  }
+
+  .g-card:hover img{
+    transform: scale(1.035);
+  }
+
+  /* allow video elements inside .g-card to behave like images */
+  .g-card video,
+  .g-card .g-card-media{
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    transition: transform .6s cubic-bezier(.16,1,.3,1);
+    background: var(--bg-soft);
+  }
+
+  .g-card:hover video,
+  .g-card:hover .g-card-media{
+    transform: scale(1.035);
+  }
+
+  .g-card-tags{
+    position: absolute;
+    left: 14px;
+    bottom: 14px;
+    display: flex;
+    gap: 6px;
+    z-index: 1;
+    flex-wrap: wrap;
+  }
+
+  .g-tag{
+    font-size: 12px;
+    letter-spacing: 0.01em;
+    color: var(--text);
+   
+    padding: 3px 10px;
+
+  }
+.g-tag-accent {
+  font-size: 11px;
+  border-radius: 2px;
+}
+  .g-tag.g-tag-accent{
+    backdrop-filter: blur(6px);
+    color: var(--text-dim);
+    background: rgba(22,18,15,0.4);
+  }
+
+  @media (max-width: 1100px){
+    .masonry{ column-count: 3; }
+  }
+
+  @media (max-width: 760px){
+    .masonry{ column-count: 2; column-gap: 14px; }
+    .g-card{ margin-bottom: 14px; }
+  }
+
+  @media (max-width: 480px){
+    .masonry{ column-count: 1; }
+  }
+
+  .gallery-cta{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 28px;
+    width: 100%;
+  }
+
+  .gallery-cta a{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 18px;
+    border-radius: 3px;
+    border:none;
+    background: #241F1A;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+    transition: background .25s ease, transform .25s ease, border-color .25s ease;
+  }
+
+  .gallery-cta a:hover{
+    background: rgba(244,240,234,0.1);
+    border-color: rgba(244,240,234,0.2);
+    transform: translateY(-1px);
+  }
+
+  /* ---------- ABOUT SECTION ---------- */
+  .about-section{
+    padding: 60px 15px 140px;
+  }
+
+  .about-grid{
+    display: grid;
+    grid-template-columns: 1fr 1.35fr;
+    gap: 60px;
+    align-items: center;
+  }
+
+  .about-copy{
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 100%;
+  }
+
+  .about-eyebrow{
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 18px;
+    letter-spacing: 0.01em;
+  }
+
+  .about-headline{
+    font-weight: 300;
+    font-size: clamp(26px, 3.2vw, 38px);
+    line-height: 1.22;
+    letter-spacing: -0.015em;
+    color: var(--text);
+    margin-bottom: 22px;
+  }
+
+  .about-headline em{
+    font-family: "Instrument Serif", serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--text);
+  }
+
+  .about-text{
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--text-dim);
+    max-width: 380px;
+    margin-bottom: 32px;
+  }
+
+  .about-actions{
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 24px;
+  }
+
+  .about-btn{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 9px 16px;
+    border-radius: 3px;
+    transition: background .25s ease, border-color .25s ease, transform .25s ease;
+  }
+
+  .about-btn-primary{
+    background: var(--text);
+    color: var(--bg);
+    border: none;
+  }
+
+  .about-btn-primary:hover{
+    transform: translateY(-1px);
+  }
+
+  .about-btn-primary .dot{
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent-green);
+    flex-shrink: 0;
+  }
+
+  .about-btn-secondary{
+    background: #241F1A;
+    color: var(--text);
+    border: none;
+  }
+
+  .about-btn-secondary:hover{
+    background: rgba(244,240,234,0.08);
+    border-color: rgba(244,240,234,0.16);
+  }
+
+  .about-media{
+    padding-left: clamp(0px, 6vw, 113px);
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .about-media-card-main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 28px;
+  }
+
+  .about-media-card-main img {
+    width: min(88%, 520px) !important;
+    height: auto !important;
+    object-fit: contain !important;
+    margin: 0 auto !important;
+  }
+
+  .about-media-card{
+    position: relative;
+    border-radius: 7px;
+    overflow: hidden;
+    aspect-ratio: 4 / 5;
+    background: var(--bg-soft);
+    border: none;
+  }
+
+  .about-media-card img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform .6s cubic-bezier(.16,1,.3,1);
+  }
+
+  .about-media-card:hover img{
+    transform: scale(1.035);
+  }
+
+  .about-media-label{
+    position: absolute;
+    left: 16px;
+    bottom: 14px;
+    line-height: 1.3;
+  }
+
+  .about-media-label .name{
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .about-media-label .role{
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  @media (max-width: 900px){
+    .about-section{ padding: 40px 22px 90px; }
+    .about-grid{ grid-template-columns: 1fr; gap: 32px; }
+    .about-copy{ max-width: 100%; }
+    .about-text{ max-width: 100%; }
+    .about-media{ grid-template-columns: 1fr 1fr; padding-left: 0; }
+  }
+
+  /* ---------- FOOTER ---------- */
+  .footer{
+    padding: 70px 15px 32px;
+    /* border-top: 1px solid var(--hairline); */
+  }
+
+  .footer-top{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    padding-bottom: 64px;
+  }
+
+  .footer-heading{
+    font-weight: 300;
+    font-size: clamp(1.5rem, 2.4vw, 2.125rem);
+    letter-spacing: -0.01em;
+    color: var(--text);
+    padding-bottom: 16px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .footer-links{
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .footer-links a{
+    display: inline-block;
+    font-size: 16px;
+    color: var(--text);
+    transition: color .2s ease, transform .2s ease;
+  }
+
+  .footer-links a:hover{
+    color: var(--text-dim);
+    transform: translateX(2px);
+  }
+
+  .footer-links a.footer-view-all{
+    color: var(--text-dim);
+  }
+
+  .footer-links a.footer-view-all:hover{
+    color: var(--text);
+  }
+
+  .footer-cta{
+    display: grid;
+    grid-template-columns: minmax(240px, 440px) 1fr;
+    gap: 20px;
+    align-items: center;
+    padding: 8px 0 26px;
+  }
+
+  .footer-cta-media{
+    position: relative;
+    border-radius: 7px;
+    overflow: hidden;
+    aspect-ratio: 23 / 10;
+    background: var(--bg-soft);
+    border: none;
+  }
+
+  .footer-cta-media iframe{
+   width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+  pointer-events: none;   /* add this line */
+  }
+
+  .footer-cta-heading{
+    font-weight: 300;
+    font-size: clamp(32px, 5.4vw, 62px);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: var(--text);
+    margin-bottom: 32px;
+  }
+
+  .footer-cta-heading em{
+    font-family: "Instrument Serif", serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--text);
+  }
+
+  .footer-cta-actions{
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .footer-email{
+    font-size: 16px;
+    color: var(--text);
+  }
+
+  .footer-time{
+    font-size: 13px;
+    color: var(--text-dimmer);
+  }
+
+  .footer-time strong{
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .footer-bottom{
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 24px;
+    /* border-top: 1px solid var(--hairline); */
+  }
+
+  .footer-copyright{
+    font-size: 12px;
+    color: var(--text-dimmer);
+  }
+.footer-cta-content{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.footer-cta-poster {
+
+  position: absolute;
+  inset: 0;
+  background: var(--bg-soft) center/cover no-repeat;
+  /* swap in a real thumbnail if you have one, e.g.: */
+  /* background-image: url('https://img.youtube.com/vi/rvpD9e-wPBk/hqdefault.jpg'); */
+  z-index: 2;
+  opacity: 1;
+  transition: opacity .5s ease;
+  pointer-events: none;
+}
+.footer-cta-poster.is-hidden{
+  opacity: 0;
+}
+  @media (max-width: 900px){
+    .footer{ padding: 50px 22px 24px; }
+    .footer-top{ grid-template-columns: repeat(2, 1fr); gap: 36px 24px; padding-bottom: 48px; }
+    .footer-cta{ grid-template-columns: 1fr; gap: 28px; padding: 0 0 40px; }
+    .footer-cta-media{ aspect-ratio: 16/9; }
+  }
+
+  @media (max-width: 480px){
+    .footer-top{ grid-template-columns: 1fr; }
+    .footer-cta-actions{ gap: 10px; }
+   
+  }
+
+  /* ---------- BOOK A CALL MODAL ---------- */
+  .modal-overlay{
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 8, 6, 0.55);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .3s ease;
+    padding: 20px;
+  }
+
+  .modal-overlay.is-open{
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .modal-card{
+    background: var(--bg-soft);
+    border: none;
+    border-radius: 7px;
+    padding: 32px 34px;
+    width: 100%;
+    max-width: 360px;
+    box-shadow: 0 30px 70px rgba(0,0,0,0.45);
+    transform: translateY(14px) scale(0.97);
+    opacity: 0;
+    transition: transform .32s cubic-bezier(.2,.8,.2,1), opacity .3s ease;
+  }
+
+  .modal-overlay.is-open .modal-card{
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+
+  .modal-eyebrow{
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 0.01em;
+    margin-bottom: 20px;
+  }
+
+  .modal-row{
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .modal-row:last-of-type{
+    border-bottom: none;
+  }
+
+  .modal-label{
+    font-size: 11px;
+    color: var(--text-dimmer);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .modal-value{
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    transition: color .2s ease;
+  }
+
+  .modal-value:hover{
+    color: var(--text-dim);
+  }
+
+  .modal-hint{
+    margin-top: 18px;
+    font-size: 11px;
+    color: var(--text-dimmer);
+    text-align: center;
+  }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 900px){
+    .nav{ padding: 16px 22px; flex-wrap: wrap; gap: 14px; }
+    .nav-links{ display:none; }
+    .nav-burger{ display: flex; }
+    .nav-mobile-panel{ display: flex; }
+    .nav-mobile-overlay{ display: block; }
+    .theme-toggle{ display: none; }
+    .intro-wrap{ justify-content:flex-start; padding: 30px 22px 0; }
+    .intro-text{ max-width: 100%; }
+    .work-gallery{ grid-template-columns: 1fr; padding: 32px 22px 0; }
+    .hero{ padding: 28px 22px 50px; }
+    .badge{ display:none; }
+    .headline-line{ flex-direction: row; align-items: flex-end; gap: 0; }
+    .headline-script{ margin-right: 8px; }
+    .headline{ font-size: clamp(46px, 7vw, 104px); }
+    .client-work{ padding: 30px 22px 70px; padding-top: 90px; }
+    .cw-header{ justify-content: flex-start; }
+    .cw-header-inner{ margin-right: 0; padding-right: 0; }
+    .cw-list{ padding-right: 0; }
+    .cw-row{ flex-wrap: wrap; gap: 6px 16px; }
+    .cw-row-name{ min-width: 0; width: 100%; }
+    .cw-row-meta{ text-align: left; }
+    .gallery-section{ padding: 40px 22px 90px; }
+    .work-card{ height: clamp(220px, 65vw, 420px); }
+  }
+
+  @media (max-width: 640px){
+    .intro-wrap{ padding: 24px 18px 0; }
+    .hero{ padding: 24px 18px 40px; }
+    .client-work{ padding: 24px 18px 60px; padding-top: 70px; }
+    .gallery-section{ padding: 32px 18px 70px; }
+    .about-section{ padding: 32px 18px 70px; }
+    .footer{ padding: 40px 18px 20px; }
+    .footer-cta-heading{ margin-bottom: 20px; }
+    .about-media-card-main{ padding: 16px; }
+    .modal-card{ padding: 26px 22px; }
+  }
+
+  .c-c-h {
+    color:#2B2B2B !important;
+  }
+  .c-c {
+    color:#6C7275 !important;
+  }
+
+  /* Respect users who've asked for less motion */
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* Reduce blur cost on touch/small screens: backdrop-filter is one of
+     the more expensive paints, so we keep it only where the desktop
+     hover-preview / modal actually need it. */
+  @media (max-width: 700px){
+    .work-card .work-label{ backdrop-filter: none; background: rgba(22,18,15,0.75); }
+  }
+</style>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-left">
+      <span class="nav-logo"><img src="logo-svg.svg" alt="Onside Studio logo"></span>
+      <span class="nav-name">Onside Studio</span>
+      <span class="nav-role">Design & Engineering</span>
+    </div>
+    <div class="nav-links">
+      <a href="#work" onclick="document.getElementById('work').scrollIntoView({behavior:'smooth', block:'start'}); return false;">Work</a>
+      <a href="#about" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth', block:'start'}); return false;">Writing</a>
+      <a href="#about" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth', block:'start'}); return false;">About</a>
+      <a href="#contact" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth', block:'start'}); return false;">Contact</a>
+    </div>
+    <div class="nav-burger" id="navBurger" role="button" aria-label="Toggle menu" aria-expanded="false">
+      <span></span>
+    </div>
+    <div class="theme-toggle" id="themeToggle">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </div>
+    <div class="nav-mobile-overlay" id="navMobileOverlay"></div>
+    <div class="nav-mobile-panel" id="navMobilePanel">
+      <a href="#work" onclick="closeMobileNav(); document.getElementById('work').scrollIntoView({behavior:'smooth', block:'start'}); return false;">Work</a>
+      <a href="#about" onclick="closeMobileNav(); document.getElementById('about').scrollIntoView({behavior:'smooth', block:'start'}); return false;">Writing</a>
+      <a href="#about" onclick="closeMobileNav(); document.getElementById('about').scrollIntoView({behavior:'smooth', block:'start'}); return false;">About</a>
+      <a href="#contact" onclick="closeMobileNav(); document.getElementById('contact').scrollIntoView({behavior:'smooth', block:'start'}); return false;">Contact</a>
+      <div class="nav-mobile-theme-row">
+        <span class="label">Theme</span>
+        <div class="nav-mobile-theme-toggle" id="mobileThemeToggle">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="intro-wrap">
+    <p class="intro-text" id="introText">
+      We design and build custom digital <strong>experiences</strong>, from concept to <strong>production</strong>.
+    </p>
+  </div>
+
+ 
+
+  <section class="hero">
+    <div class="headline-line">
+      <span class="headline" id="line1">Websites Made to Be Experienced.</span>
+    </div>
+    <div class="headline-line">
+      <span class="headline-script" id="scriptWord">Onside</span>
+      <span class="headline" id="line2">Studio.</span>
+    </div>
+  </section>
+
+   <div class="work-gallery" id="workGallery">
+    <div class="work-card">
+      <img src="front.jpeg" alt="Project preview one" fetchpriority="high" decoding="async">
+      <span class="work-label">Interactive Motion Graphic</span>
+    </div>
+    <div class="work-card">
+      <img src="https://i.pinimg.com/1200x/ce/b6/9d/ceb69d6a206db3ad2bce48f1b099ea06.jpg" alt="Project preview two" loading="eager" decoding="async">
+      <span class="work-label">Abstract Study</span>
+    </div>
+  </div>
+
+  <div id="cursorPreview" class="cursor-preview" aria-hidden="true">
+    <img src="https://i.pinimg.com/736x/d8/3c/47/d83c4768ab0f86e51512878f57c56efe.jpg" alt="Preview" loading="lazy" decoding="async">
+  </div>
+
+  <section class="client-work" id="work">
+    <div class="cw-header">
+      <div class="cw-header-inner">
+        <div class="cw-eyebrow">Selected work</div>
+        <h2 class="cw-headline">Digital experiences, <em>crafted</em> from concept to code.</h2>
+      </div>
+    </div>
+
+    <div class="cw-list" id="cwList">
+      <div class="cw-row" data-image="s-w-1.png">
+        <span class="cw-row-name">CUSP</span>
+        <span class="cw-row-meta">Hero · Motion-Graphic </span>
+        <span class="cw-row-year">2024</span>
+      </div>
+      <div class="cw-row" data-image="s-w-2.png">
+        <span class="cw-row-name">Agency</span>
+        <span class="cw-row-meta">FullCustom · GSAP WebGL</span>
+        <span class="cw-row-year">2026</span>
+      </div>
+      <div class="cw-row" data-image="s-w-3.png">
+        <span class="cw-row-name">Developer</span>
+        <span class="cw-row-meta">FullCustom · GSAP Vanilla JS</span>
+        <span class="cw-row-year">2026</span>
+      </div>
+    </div>
+
+      <div class="cw-footer">
+      <a href="#gallery" class="cw-all-btn" onclick="document.getElementById('gallery').scrollIntoView({behavior:'smooth', block:'start'}); return false;">All work</a>
+    </div>
+  </section>
+
+  <!-- ---------- MASONRY GALLERY SECTION ---------- -->
+  <section class="gallery-section" id="gallery">
+    <h2 class="gallery-heading">
+      A collection of<em> self-initiated projects</em>,<br> and <em>experiments</em>.
+    </h2>
+
+    <div class="masonry" id="masonryGrid">
+      <div class="g-card">
+        <img src="port3.jpeg" alt="Portfolio v1" loading="lazy" decoding="async">
+        <div class="g-card-tags"><span class="g-tag">Portfolio v1</span><span class="g-tag g-tag-accent">Vanilla Js</span></div>
+      </div>
+      <div class="g-card">
+        <img src="port5.jpg" alt="Tesla 3D" loading="lazy" decoding="async">
+        <div class="g-card-tags"><span class="g-tag">Portfolio v2</span><span class="g-tag g-tag-accent">WebGL</span></div>
+      </div>
+      <div class="g-card">
+        <video class="g-card-media" data-src="Video-Project-3.mp4" muted loop playsinline preload="none">
+          Your browser does not support the video tag.
+        </video>
+        <div class="g-card-tags"><span class="g-tag">Portfolio v3</span><span class="g-tag g-tag-accent">GSAP</span></div>
+      </div>
+      <div class="g-card">
+        <img src="full1.jpeg" alt="Bug's Life" loading="lazy" decoding="async">
+        <div class="g-card-tags"><span class="g-tag">Portfolio v1</span><span class="g-tag g-tag-accent">Vanilla Js</span></div>
+      </div>
+      <div class="g-card">
+        <img src="front.jpeg" alt="Mixbox" loading="lazy" decoding="async">
+        <div class="g-card-tags"><span class="g-tag">Portfolio v4</span><span class="g-tag g-tag-accent c-c">Motion Graphic</span></div>
+      </div>
+      <div class="g-card">
+        <video class="g-card-media" data-src="Video-Project-4.mp4" muted loop playsinline preload="none">
+          Your browser does not support the video tag.
+        </video>
+        <div class="g-card-tags"><span class="g-tag c-c-h">Portfolio v4</span><span class="g-tag g-tag-accent c-c">Motion Graphic</span></div>
+      </div>
+      <div class="g-card">
+        <img src="port2.jpeg" alt="Nike App" loading="lazy" decoding="async">
+        <div class="g-card-tags"><span class="g-tag">Portfolio v5</span><span class="g-tag g-tag-accent">GSAP</span></div>
+      </div>
+      <div class="g-card">
+        <img src="port6.jpg" alt="Education for Everyone" loading="lazy" decoding="async">
+        <div class="g-card-tags"><span class="g-tag">Portfolio v6</span><span class="g-tag g-tag-accent">WebGL</span></div>
+      </div>
+       <div class="g-card">
+        <video class="g-card-media" data-src="Video-Project-2.mp4" muted loop playsinline preload="none">
+          Your browser does not support the video tag.
+        </video>
+        <div class="g-card-tags"><span class="g-tag">Portfolio v5</span><span class="g-tag g-tag-accent">GSAP</span></div>
+      </div>
+      <div class="g-card">
+        <video class="g-card-media" data-src="Video-Project-1.mp4" muted loop playsinline preload="none">
+          Your browser does not support the video tag.
+        </video>
+        <div class="g-card-tags"><span class="g-tag c-c-h">Portfolio v2</span><span class="g-tag g-tag-accent c-c">WebGL</span></div>
+      </div>
+      <div class="g-card">
+        <img src="port4.jpeg" alt="Pinball Machine" loading="lazy" decoding="async">
+        <div class="g-card-tags"><span class="g-tag c-c-h">Portfolio v7</span><span class="g-tag g-tag-accent c-c">Experiment</span></div>
+      </div>
+      <div class="g-card">
+        <video class="g-card-media" data-src="Video-Project-5.mp4" muted loop playsinline preload="none">
+          Your browser does not support the video tag.
+        </video>
+        <div class="g-card-tags"><span class="g-tag c-c-h">Portfolio v1</span><span class="g-tag g-tag-accent c-c">Vanilla Js</span></div>
+      </div>
+    </div>
+
+    <div class="gallery-cta">
+      <!-- <a href="#work">View all projects</a> -->
+    </div>
+  </section>
+
+  <!-- ---------- ABOUT SECTION ---------- -->
+  <section class="about-section" id="about">
+    <div class="about-grid">
+      <div class="about-copy">
+        <div class="about-eyebrow">About</div>
+        <h2 class="about-headline">Onside Studio is an independent Pakistan-based <em>creative studio</em> focused on web design, development and digital experiences.</h2>
+        <p class="about-text">
+          We design and build custom websites from concept to production, combining thoughtful design with creative development and interactive experiences.
+        </p>
+        <div class="about-actions">
+          <a href="#" class="about-btn about-btn-primary" onclick="openBookCallModal(event)"><span class="dot"></span>Message Us</a>
+          <a href="#about" class="about-btn about-btn-secondary" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth', block:'start'}); return false;">About</a>
+        </div>
+      </div>
+
+      <div class="about-media">
+        <div class="about-media-card about-media-card-main">
+          <img src="logo-svg.svg" alt="Onside Studio" loading="lazy" decoding="async">
+          <div class="about-media-label">
+            <div class="name">Onside Studio</div>
+            <div class="role">Design & Engineering</div>
+          </div>
+        </div>
+        <div class="about-media-card">
+          <img src="https://i.pinimg.com/1200x/55/35/7c/55357c9016a798ce997f6e9730644f41.jpg" alt="Abstract fluid gradient" loading="lazy" decoding="async">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- FOOTER ---------- -->
+  <footer class="footer" id="contact">
+    <div class="footer-top" id="footerTop">
+      <div class="footer-col">
+        <h3 class="footer-heading">Work</h3>
+        <ul class="footer-links">
+          <li><a href="#work" onclick="document.getElementById('work').scrollIntoView({behavior:'smooth', block:'start'}); return false;">CUSP</a></li>
+          <li><a href="#work" onclick="document.getElementById('work').scrollIntoView({behavior:'smooth', block:'start'}); return false;">Agency</a></li>
+          <li><a href="#work" onclick="document.getElementById('work').scrollIntoView({behavior:'smooth', block:'start'}); return false;">Developer</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h3 class="footer-heading">Projects</h3>
+        <ul class="footer-links">
+          <li><a href="#gallery" onclick="document.getElementById('gallery').scrollIntoView({behavior:'smooth', block:'start'}); return false;">Portfolio v1</a></li>
+          <li><a href="#gallery" onclick="document.getElementById('gallery').scrollIntoView({behavior:'smooth', block:'start'}); return false;">Portfolio v2</a></li>
+          <li><a href="#gallery" onclick="document.getElementById('gallery').scrollIntoView({behavior:'smooth', block:'start'}); return false;">Portfolio v3</a></li>
+          <li><a href="#gallery" onclick="document.getElementById('gallery').scrollIntoView({behavior:'smooth', block:'start'}); return false;">Portfolio v4</a></li>
+          <li><a href="#gallery" onclick="document.getElementById('gallery').scrollIntoView({behavior:'smooth', block:'start'}); return false;">Portfolio v5</a></li>
+          <li><a href="#gallery" class="footer-view-all" onclick="document.getElementById('gallery').scrollIntoView({behavior:'smooth', block:'start'}); return false;">View all ↗</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h3 class="footer-heading">Writing</h3>
+        <ul class="footer-links">
+          <li><a href="#about" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth', block:'start'}); return false;">About Onside Studio</a></li>
+          <li><a href="#work" onclick="document.getElementById('work').scrollIntoView({behavior:'smooth', block:'start'}); return false;">Selected Work</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h3 class="footer-heading">Elsewhere</h3>
+        <ul class="footer-links">
+          <li><a href="https://instagram.com/onside.studio" target="_blank" rel="noopener">Instagram ↗</a></li>
+          <li><a href="mailto:fardansultan47@gmail.com">Email</a></li>
+          
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-cta" id="footerCta">
+      <div class="footer-cta-media" id="footerCtaMedia">
+  <div class="footer-cta-poster" id="footerCtaPoster"></div>
+</div>
+      <div class="footer-cta-content">
+        <h2 class="footer-cta-heading">Want to work <em>together?</em></h2>
+        <div class="footer-cta-actions">
+          <a href="#" class="about-btn about-btn-primary" onclick="openBookCallModal(event)"><span class="dot"></span>Message Us</a>
+          <a href="#about" class="about-btn about-btn-secondary" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth', block:'start'}); return false;">About</a>
+          <span class="footer-email">fardansultan47@gmail.com</span>
+          <span class="footer-time"><span id="footerTime">--:--</span> <strong>Pakistan</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span class="footer-copyright">©2026 Onside Studio</span>
+    </div>
+  </footer>
+
+  <!-- ---------- BOOK A CALL MODAL ---------- -->
+  <div class="modal-overlay" id="bookCallOverlay">
+    <div class="modal-card" id="bookCallCard">
+      <!-- <div class="modal-eyebrow">Get in touch</div> -->
+      <div class="modal-row">
+        <span class="modal-label">Email</span>
+        <a href="mailto:fardansultan47@gmail.com" class="modal-value">fardansultan47@gmail.com</a>
+      </div>
+      <div class="modal-row">
+        <span class="modal-label">Instagram</span>
+        <a href="https://instagram.com/onside.studio" target="_blank" rel="noopener" class="modal-value">@onside.studio</a>
+      </div>
+      <!-- <div class="modal-hint">Click outside this card to close</div> -->
+    </div>
+  </div>
+
+<script>
+  gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
+  const isSmallScreen = window.matchMedia('(max-width: 900px)').matches;
+
+  /* ---------------------------------------------------------
+     LENIS SMOOTH SCROLL — synced to GSAP's ticker so
+     ScrollTrigger stays perfectly in step with the scroller.
+     Skipped on touch devices: native touch scrolling is
+     already smooth and cheaper on battery/CPU than re-driving
+     scroll through rAF + Lenis on a phone.
+  --------------------------------------------------------- */
+  let lenis;
+  if (!prefersReducedMotion && !isCoarsePointer && window.Lenis) {
+    lenis = new Lenis({
+      duration: 1.1,
+      easing: (t) => 1 - Math.pow(1 - t, 3),
+      smoothWheel: true,
+      wheelMultiplier: 1,
+      touchMultiplier: 1.15,
+    });
+
+    lenis.on('scroll', ScrollTrigger.update);
+
+    gsap.ticker.add((time) => { lenis.raf(time * 1000); });
+    gsap.ticker.lagSmoothing(0);
+
+    // Let ScrollToPlugin-driven anchor jumps (below) also move Lenis's internal scroll.
+    ScrollTrigger.scrollerProxy(document.body, {
+      scrollTop(value) {
+        if (arguments.length) { lenis.scrollTo(value, { immediate: true }); }
+        return lenis.scroll || window.scrollY;
+      }
+    });
+  }
+
+  ScrollTrigger.config({ ignoreMobileResize: true });
+  gsap.defaults({ overwrite: 'auto' });
+
+  /* ---------------------------------------------------------
+     KEEP SCROLLTRIGGER POSITIONS ACCURATE ON MOBILE.
+     Images/videos loading in late (and layout shifting as they
+     do) change the page's real scrollable height. If we never
+     re-measure, ScrollTrigger's cached "reveal at 85% scroll"
+     positions go stale and some sections (often the footer,
+     since it's last) end up with a trigger point past where the
+     page can actually scroll — so they never fire and stay
+     invisible. ignoreMobileResize above only suppresses the
+     *automatic* resize listener (to avoid jank when the mobile
+     address bar shows/hides); it doesn't block these manual
+     refresh() calls.
+  --------------------------------------------------------- */
+  function refreshScrollTrigger(){ ScrollTrigger.refresh(); }
+
+  window.addEventListener('load', refreshScrollTrigger);
+
+  const mediaEls = document.querySelectorAll('img, video');
+  let pendingMedia = mediaEls.length;
+  function onMediaSettled(){
+    pendingMedia = Math.max(0, pendingMedia - 1);
+    if (pendingMedia === 0) refreshScrollTrigger();
+  }
+  mediaEls.forEach((el) => {
+    if (el.tagName === 'IMG') {
+      if (el.complete) { onMediaSettled(); }
+      else {
+        el.addEventListener('load', onMediaSettled, { once: true });
+        el.addEventListener('error', onMediaSettled, { once: true });
+      }
+    } else {
+      if (el.readyState >= 1) { onMediaSettled(); }
+      else {
+        el.addEventListener('loadedmetadata', onMediaSettled, { once: true });
+        el.addEventListener('error', onMediaSettled, { once: true });
+      }
+    }
+  });
+
+  let resizeRefreshTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeRefreshTimer);
+    resizeRefreshTimer = setTimeout(refreshScrollTrigger, 200);
+  });
+  window.addEventListener('orientationchange', () => {
+    setTimeout(refreshScrollTrigger, 300);
+  });
+
+  // Belt-and-braces: gallery cards lazy-load as they scroll into view and
+  // can nudge page height after their own reveal animation runs, so give
+  // ScrollTrigger one more re-measure shortly after each batch appears.
+  const debouncedBatchRefresh = (() => {
+    let t;
+    return () => { clearTimeout(t); t = setTimeout(refreshScrollTrigger, 250); };
+  })();
+
+  // page-load entrance sequence
+  const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+  gsap.set(["#line1", "#scriptWord", "#line2", "#introText"], { opacity: 0 });
+  gsap.set("#line1", { y: 30 });
+  gsap.set("#scriptWord", { y: 24 });
+  gsap.set("#line2", { y: 30 });
+  gsap.set("#introText", { y: 10 });
+  gsap.set("#workGallery", { y: 16 });
+
+  tl.to(".nav", { opacity: 1, duration: .01 })
+    .to("#introText", { opacity: 1, y: 0, duration: .7 }, 0.1)
+    .to("#workGallery", { opacity: 1, y: 0, duration: .8 }, 0.22)
+    .to("#line1", { opacity: 1, y: 0, duration: .9 }, 0.4)
+    .to("#scriptWord", { opacity: 1, y: 0, duration: .9 }, 0.55)
+    .to("#line2", { opacity: 1, y: 0, duration: .9 }, 0.65);
+
+  // theme toggle (visual only) — shared by the desktop icon and the one inside the mobile drawer
+  function toggleTheme() {
+    document.body.classList.toggle("light");
+  }
+  document.getElementById("themeToggle").addEventListener("click", toggleTheme);
+  document.getElementById("mobileThemeToggle").addEventListener("click", toggleTheme);
+
+  // mobile nav (hamburger) — slides a drawer in from the right, with a
+  // backdrop overlay and the page scroll locked while it's open.
+  const navBurger = document.getElementById('navBurger');
+  const navMobilePanel = document.getElementById('navMobilePanel');
+  const navMobileOverlay = document.getElementById('navMobileOverlay');
+
+  function lockBodyScroll(lock){
+    document.body.style.overflow = lock ? 'hidden' : '';
+    if (lenis) { lock ? lenis.stop() : lenis.start(); }
+  }
+
+  function openMobileNav(){
+    navBurger.classList.add('is-open');
+    navBurger.setAttribute('aria-expanded', 'true');
+    navMobilePanel.classList.add('is-open');
+    navMobileOverlay.classList.add('is-open');
+    lockBodyScroll(true);
+  }
+
+  function closeMobileNav(){
+    navBurger.classList.remove('is-open');
+    navBurger.setAttribute('aria-expanded', 'false');
+    navMobilePanel.classList.remove('is-open');
+    navMobileOverlay.classList.remove('is-open');
+    lockBodyScroll(false);
+  }
+
+  navBurger.addEventListener('click', () => {
+    navBurger.classList.contains('is-open') ? closeMobileNav() : openMobileNav();
+  });
+
+  navMobileOverlay.addEventListener('click', closeMobileNav);
+
+  // scroll-triggered reveal for the client work list
+  gsap.set(".cw-header-inner", { opacity: 0, y: 16 });
+  gsap.set(".cw-row", { opacity: 0, y: 12 });
+  gsap.set(".cw-footer", { opacity: 0 });
+
+  gsap.to(".cw-header-inner", {
+    opacity: 1, y: 0, duration: .7, ease: "power3.out",
+    scrollTrigger: { trigger: ".client-work", start: "top 82%" }
+  });
+
+  gsap.to(".cw-row", {
+    opacity: 1, y: 0, duration: .6, ease: "power3.out", stagger: 0.08,
+    scrollTrigger: { trigger: "#cwList", start: "top 85%" }
+  });
+
+  gsap.to(".cw-footer", {
+    opacity: 1, duration: .6, ease: "power3.out", delay: .2,
+    scrollTrigger: { trigger: ".client-work", start: "top 70%" }
+  });
+
+  /* ---------------------------------------------------------
+     CURSOR PREVIEW — mousemove is driven through
+     requestAnimationFrame instead of firing on every raw
+     browser event, which is a big win on trackpads / high
+     polling-rate mice. Skipped entirely on touch devices,
+     where hover doesn't apply anyway.
+  --------------------------------------------------------- */
+  if (!isCoarsePointer) {
+    const preview = document.getElementById('cursorPreview');
+    const previewImg = preview.querySelector('img');
+    const previewOffsetX = 130;
+    const previewOffsetY = 80;
+
+    let pendingPreviewEvent = null;
+    let previewRafScheduled = false;
+
+    function scheduleUpdatePreview(event) {
+      pendingPreviewEvent = event;
+      if (!previewRafScheduled) {
+        previewRafScheduled = true;
+        requestAnimationFrame(flushPreviewUpdate);
+      }
+    }
+
+    function flushPreviewUpdate() {
+      previewRafScheduled = false;
+      if (!pendingPreviewEvent) return;
+      preview.style.left = `${pendingPreviewEvent.clientX + previewOffsetX}px`;
+      preview.style.top = `${pendingPreviewEvent.clientY + previewOffsetY}px`;
+    }
+
+    document.querySelectorAll('.cw-row').forEach((row) => {
+      row.addEventListener('mouseenter', (event) => {
+        row.classList.add('is-active');
+        const image = row.getAttribute('data-image') || 'https://i.pinimg.com/736x/d8/3c/47/d83c4768ab0f86e51512878f57c56efe.jpg';
+        previewImg.src = image;
+        preview.classList.remove('is-visible');
+        void preview.offsetWidth;
+        preview.classList.add('is-visible');
+        scheduleUpdatePreview(event);
+      }, { passive: true });
+
+      row.addEventListener('mousemove', scheduleUpdatePreview, { passive: true });
+
+      row.addEventListener('mouseleave', () => {
+        row.classList.remove('is-active');
+        preview.classList.remove('is-visible');
+      }, { passive: true });
+    });
+  } else {
+    // On touch, tapping a row still gets a visible "active" state, just no floating preview.
+    document.querySelectorAll('.cw-row').forEach((row) => {
+      row.addEventListener('click', () => {
+        document.querySelectorAll('.cw-row.is-active').forEach(r => { if (r !== row) r.classList.remove('is-active'); });
+        row.classList.toggle('is-active');
+      });
+    });
+  }
+
+  /* ---------------------------------------------------------
+     MASONRY GALLERY REVEAL — batched into a single set of
+     ScrollTriggers (instead of one trigger per card) so the
+     scroll listener stays cheap even with a large grid.
+  --------------------------------------------------------- */
+  ScrollTrigger.batch(".g-card", {
+    start: "top 90%",
+    interval: 0.06,
+    batchMax: 4,
+    onEnter: (batch) => {
+      gsap.to(batch, {
+        opacity: 1, y: 0, duration: .7, ease: "power3.out", stagger: 0.06, overwrite: true
+      });
+      debouncedBatchRefresh();
+    }
+  });
+
+  // about section reveal
+  gsap.set(".about-copy > *", { opacity: 0, y: 16 });
+  gsap.set(".about-media-card", { opacity: 0, y: 20 });
+
+  gsap.to(".about-copy > *", {
+    opacity: 1, y: 0, duration: .7, ease: "power3.out", stagger: 0.08,
+    scrollTrigger: { trigger: ".about-section", start: "top 80%" }
+  });
+
+  gsap.to(".about-media-card", {
+    opacity: 1, y: 0, duration: .8, ease: "power3.out", stagger: 0.1,
+    scrollTrigger: { trigger: ".about-section", start: "top 78%" }
+  });
+
+  // footer reveal
+  gsap.set(".footer-col", { opacity: 0, y: 16 });
+  gsap.set(".footer-cta-media", { opacity: 0, y: 20 });
+  gsap.set(".footer-cta-heading, .footer-cta-actions", { opacity: 0, y: 16 });
+  gsap.set(".footer-bottom", { opacity: 0 });
+
+  gsap.to(".footer-col", {
+    opacity: 1, y: 0, duration: .7, ease: "power3.out", stagger: 0.08,
+    scrollTrigger: { trigger: ".footer-top", start: "top 88%" }
+  });
+
+  gsap.to(".footer-cta-media", {
+    opacity: 1, y: 0, duration: .8, ease: "power3.out",
+    scrollTrigger: { trigger: ".footer-cta", start: "top 85%" }
+  });
+
+  gsap.to(".footer-cta-heading, .footer-cta-actions", {
+    opacity: 1, y: 0, duration: .7, ease: "power3.out", stagger: 0.1,
+    scrollTrigger: { trigger: ".footer-cta", start: "top 85%" }
+  });
+
+  gsap.to(".footer-bottom", {
+    opacity: 1, duration: .6, ease: "power3.out",
+    scrollTrigger: { trigger: ".footer-bottom", start: "top bottom" }
+  });
+
+  // live Karachi time
+  function updateFooterTime() {
+    const el = document.getElementById('footerTime');
+    if (!el) return;
+    const now = new Date();
+    const formatted = new Intl.DateTimeFormat('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone: 'Asia/Karachi'
+    }).format(now);
+    el.textContent = formatted;
+  }
+  updateFooterTime();
+  setInterval(updateFooterTime, 30000);
+
+  /* ---------------------------------------------------------
+     FOOTER YOUTUBE EMBED — the iframe (with its own player,
+     network requests and autoplay) is only created once the
+     footer actually scrolls into view, instead of loading and
+     autoplaying immediately on page load. Skipped on small /
+     touch screens where autoplaying background video is mostly
+     wasted bandwidth and a common source of jank.
+  --------------------------------------------------------- */
+  const footerCtaMedia = document.getElementById('footerCtaMedia');
+  let footerVideoLoaded = false;
+
+  function loadFooterVideo() {
+    if (footerVideoLoaded || !footerCtaMedia) return;
+    footerVideoLoaded = true;
+
+    const iframe = document.createElement('iframe');
+    iframe.src = "https://www.youtube.com/embed/rvpD9e-wPBk?autoplay=1&mute=1&loop=1&playlist=rvpD9e-wPBk&controls=0&disablekb=1&modestbranding=1&playsinline=1&rel=0";
+    iframe.title = "YouTube video";
+    iframe.allow = "autoplay; encrypted-media; picture-in-picture";
+    iframe.allowFullscreen = true;
+    iframe.loading = "lazy";
+    footerCtaMedia.appendChild(iframe);
+
+    setTimeout(() => {
+      document.getElementById("footerCtaPoster")?.classList.add("is-hidden");
+    }, 1800); // gives YouTube's player time to actually start playing
+  }
+
+  ScrollTrigger.create({
+    trigger: ".footer-cta",
+    start: "top 85%",
+    once: true,
+    onEnter: loadFooterVideo
+  });
+
+  /* ---------------------------------------------------------
+     GALLERY VIDEOS — each clip only loads and plays while its
+     card is actually on screen, and pauses (freeing decode /
+     GPU work) once it scrolls away. Big win with 5 videos.
+     On small/touch screens we cap how many clips can be
+     decoding at once to keep scrolling smooth on lower-powered
+     phones.
+  --------------------------------------------------------- */
+  const galleryVideos = document.querySelectorAll('.g-card video[data-src]');
+  const MAX_CONCURRENT_MOBILE_VIDEOS = 2;
+  let activeMobileVideos = [];
+
+  if ('IntersectionObserver' in window && galleryVideos.length) {
+    const videoObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        const video = entry.target;
+        if (entry.isIntersecting) {
+          if (!video.src && video.dataset.src) {
+            video.src = video.dataset.src;
+            video.addEventListener('loadedmetadata', debouncedBatchRefresh, { once: true });
+          }
+          if (isSmallScreen) {
+            activeMobileVideos = activeMobileVideos.filter(v => v.isConnected);
+            if (!activeMobileVideos.includes(video)) {
+              if (activeMobileVideos.length >= MAX_CONCURRENT_MOBILE_VIDEOS) {
+                const oldest = activeMobileVideos.shift();
+                oldest && oldest.pause();
+              }
+              activeMobileVideos.push(video);
+            }
+          }
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+          activeMobileVideos = activeMobileVideos.filter(v => v !== video);
+        }
+      });
+    }, { rootMargin: "200px 0px", threshold: 0.15 });
+
+    galleryVideos.forEach((video) => videoObserver.observe(video));
+  } else {
+    // Fallback for older browsers: just load everything up front.
+    galleryVideos.forEach((video) => {
+      video.src = video.dataset.src;
+      video.play().catch(() => {});
+    });
+  }
+
+  // Smooth scrolling for in-page anchor links (excluding the dedicated "All work" button,
+  // which gets its own handler below so the two never conflict)
+  document.querySelectorAll('a[href^="#"]:not(.cw-all-btn)').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      const href = this.getAttribute('href');
+      if (!href || href === '#') return;
+      const target = document.querySelector(href);
+      if (!target) return;
+      e.preventDefault();
+      if (lenis) {
+        lenis.scrollTo(target, { offset: -24, duration: 1.1 });
+        return;
+      }
+      try {
+        gsap.to(window, { duration: 0.9, ease: 'power3.out', scrollTo: { y: target, offsetY: 24 } });
+      } catch (err) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+
+  // ---------- Book a Call modal ----------
+  function openBookCallModal(e) {
+    if (e) e.preventDefault();
+    document.getElementById('bookCallOverlay').classList.add('is-open');
+  }
+
+  document.getElementById('bookCallOverlay').addEventListener('click', function(e) {
+    // Only close when the backdrop itself is clicked, not the card inside it
+    if (e.target === this) {
+      this.classList.remove('is-open');
+    }
+  });
+
+  // Dedicated handler for the "All work" button -> scrolls to the masonry gallery
+  // Uses event delegation on document so it works regardless of timing/overlap issues
+  document.addEventListener('click', function(e) {
+    const btn = e.target.closest('.cw-all-btn');
+    if (!btn) return;
+
+    e.preventDefault();
+    const target = document.getElementById('gallery');
+    if (!target) return;
+
+    if (lenis) {
+      lenis.scrollTo(target, { offset: -24, duration: 1.1 });
+      return;
+    }
+
+    const navOffset = 24;
+    const targetY = target.getBoundingClientRect().top + window.pageYOffset - navOffset;
+    window.scrollTo({ top: targetY, behavior: 'smooth' });
+  }, true); // capture phase so nothing upstream can swallow the click first
+</script>
+</body>
+</html>
